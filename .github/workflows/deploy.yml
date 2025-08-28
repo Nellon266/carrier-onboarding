@@ -14,18 +14,24 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: supabase/setup-cli@v1
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
         with:
           version: latest
+
+      - name: Debug env (safe)
+        run: |
+          echo "Project ref: ${SUPABASE_PROJECT_REF}"
+          supabase --version
 
       - name: Login to Supabase
         run: supabase login --token "$SUPABASE_ACCESS_TOKEN"
 
       - name: Link project
-        run: supabase link --project-ref "$SUPABASE_PROJECT_REF"
+        run: supabase link --project-ref "$SUPABASE_PROJECT_REF" --debug
 
       - name: Apply DB migrations
-        run: supabase db push
+        run: supabase db push --debug
 
       - name: Deploy edge function
         run: supabase functions deploy carrier-submit --project-ref "$SUPABASE_PROJECT_REF"
